@@ -1,4 +1,4 @@
-
+import sqlite3
 from plyer import notification
 from datetime import datetime
 import requests
@@ -51,9 +51,26 @@ try:
 
     df2_stacked = df2.stack() # transformando colunas em index da tabela
 
-    print(df2_stacked)     
+    print(df2_stacked)  
+
+# Criando o banco de dados SQLite
+    conn = sqlite3.connect('dados_bancos.db')
+
+    # Inserindo DataFrame no banco de dados
+    df2.to_sql('bancos', conn, if_exists='replace', index=False)    
+
+    # Executando a consulta SQL para visualizar dados
+    consulta = conn.execute('SELECT * FROM bancos')
+    resultados = consulta.fetchall()
+    
+    print("\nDados no banco de dados:")
+    for resultado in resultados:
+        print(resultado)  
     
 
 except Exception as e:  
     alerta(3, "bancos", "extração")
     print(f"Erro na extração dos bancos: {e}")
+
+finally:
+    conn.close()
